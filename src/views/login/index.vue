@@ -13,7 +13,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="用户名"
           name="username"
           type="text"
           tabindex="1"
@@ -31,19 +31,45 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="密码"
             name="password"
             tabindex="2"
             autocomplete="on"
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
-            @keyup.enter.native="handleLogin"
           />
           <span class="show-pwd" @click="showPwd">
             <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
           </span>
         </el-form-item>
       </el-tooltip>
+      <el-form-item prop="code">
+        <el-row>
+          <el-col :span="18">
+            <span class="svg-container">
+              <svg-icon icon-class="captcha" />
+            </span>
+            <el-input
+              ref="code"
+              v-model="loginForm.code"
+              placeholder="验证码"
+              name="code"
+              type="text"
+              tabindex="3"
+              auto-complete="off"
+              maxlength="4"
+              @keyup.enter.native="handleLogin"
+            />
+          </el-col>
+          <el-col :span="6">
+            <el-image style="display: block;margin-top:5px;" :src="captchaImageUrl" @click="getCaptcha">
+              <div slot="error" class="image-slot">
+                <i class="el-icon-picture-outline" />
+              </div>
+            </el-image>
+          </el-col>
+        </el-row>
+      </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
     </el-form>
@@ -61,6 +87,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
+import md5 from 'md5'
 
 export default {
   name: 'Login',
@@ -68,26 +95,37 @@ export default {
   data() {
     const validateUsername = (rule, value, callback) => {
       if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
+        callback(new Error('请输入用户名'))
       } else {
         callback()
       }
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('请输入密码'))
+      } else {
+        callback()
+      }
+    }
+    const validateCode = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入验证码'))
       } else {
         callback()
       }
     }
     return {
+      captchaImageUrl: '',
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '000000',
+        codeId: '',
+        code: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        code: [{ required: true, trigger: 'blur', validator: validateCode }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -111,6 +149,7 @@ export default {
   },
   created() {
     // window.addEventListener('storage', this.afterQRScan)
+    this.getCaptcha()
   },
   mounted() {
     if (this.loginForm.username === '') {
@@ -137,10 +176,24 @@ export default {
         this.$refs.password.focus()
       })
     },
+    getCaptcha() {
+      var that = this
+      const r = Math.random() + ''
+      this.loginForm.codeId = r
+      this.$store.dispatch('user/captcha', { 'r': r }).then((data) => {
+        return 'data:image/png;base64,' + Buffer.from(data, 'binary').toString('base64')
+      }).then(function(data) {
+        that.captchaImageUrl = data
+      }).catch((err) => {
+        console.log(err)
+      })
+    },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
+          const password = this.loginForm.password
+          this.loginForm.password = md5(password)
           this.$store.dispatch('user/login', this.loginForm)
             .then(() => {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
@@ -148,6 +201,9 @@ export default {
             })
             .catch(() => {
               this.loading = false
+              this.loginForm.code = ''
+              this.loginForm.password = ''
+              this.getCaptcha()
             })
         } else {
           console.log('error submit!!')

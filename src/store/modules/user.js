@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo, captcha, getUserRes } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import router, { resetRouter } from '@/router'
 
@@ -29,11 +29,22 @@ const mutations = {
 }
 
 const actions = {
+  // login captcha
+  captcha({ commit }, captchaInfo) {
+    const { r } = captchaInfo
+    return new Promise((resolve, reject) => {
+      captcha(r).then(response => {
+        resolve(response)
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo
+    const { username, password, codeId, code } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ accName: username.trim(), accPwd: password, codeId: codeId, code: code.trim() }).then(response => {
         const { data } = response
         commit('SET_TOKEN', data.token)
         setToken(data.token)
@@ -43,7 +54,6 @@ const actions = {
       })
     })
   },
-
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
@@ -58,12 +68,12 @@ const actions = {
 
         // roles must be a non-empty array
         if (!roles || roles.length <= 0) {
-          reject('getInfo: roles must be a non-null array!')
+          // reject('getInfo: roles must be a non-null array!')
         }
 
-        commit('SET_ROLES', roles)
+        commit('SET_ROLES', roles || ['admin'])
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar)
+        commit('SET_AVATAR', avatar || 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png')
         commit('SET_INTRODUCTION', introduction)
         resolve(data)
       }).catch(error => {
@@ -71,7 +81,6 @@ const actions = {
       })
     })
   },
-
   // user logout
   logout({ commit, state, dispatch }) {
     return new Promise((resolve, reject) => {
@@ -120,6 +129,17 @@ const actions = {
 
     // reset visited views and cached views
     dispatch('tagsView/delAllViews', null, { root: true })
+  },
+  // get user resources
+  getUserRes({ commit, state }) {
+    return new Promise((resolve, reject) => {
+      getUserRes(state.token).then(response => {
+        const { data } = response
+        resolve(data || [])
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 

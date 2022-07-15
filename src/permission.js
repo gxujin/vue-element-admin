@@ -5,6 +5,7 @@ import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
+import Layout from '@/layout'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
@@ -35,9 +36,55 @@ router.beforeEach(async(to, from, next) => {
           // get user info
           // note: roles must be a object array! such as: ['admin'] or ,['developer','editor']
           const { roles } = await store.dispatch('user/getInfo')
+          let userRes = await store.dispatch('user/getUserRes')
+          const routes = []
+          userRes = userRes || []
+          if (userRes.length > 0) {
+            const root = userRes[0]
 
+            const nodes1 = root.child || []
+            if (nodes1.length > 0) {
+              nodes1.forEach((node1) => {
+                const { title, href, icon, resNo, child } = node1
+                const path = href === '#' ? '' : href
+                const route = {
+                  path: path,
+                  component: Layout,
+                  redirect: 'noRedirect',
+                  // alwaysShow: true,
+                  name: resNo,
+                  meta: {
+                    title: title,
+                    icon: icon
+                  },
+                  children: []
+                }
+
+                const nodes2 = child || []
+                nodes2.forEach((node2) => {
+                  const { title: sub_title, href: sub_href, icon: sub_icon, resNo: sub_resNo } = node2
+
+                  const sub_path = sub_href === '#' ? '' : sub_href.replaceAll(/^\/+/g, '')
+                  const component_path = path + '/' + sub_path
+                  const temp = {
+                    path: sub_path,
+                    component: resolve => require([`@/views${component_path}`], resolve),
+                    name: sub_resNo,
+                    meta: {
+                      title: sub_title,
+                      icon: sub_icon
+                    }
+                  }
+                  route.children.push(temp)
+                })
+
+                routes.push(route)
+              })
+            }
+          }
           // generate accessible routes map based on roles
-          const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          // const accessRoutes = await store.dispatch('permission/generateRoutes', roles)
+          const accessRoutes = await store.dispatch('permission/generateRoutes', { roles, routes })
 
           // dynamically add accessible routes
           router.addRoutes(accessRoutes)
