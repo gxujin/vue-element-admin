@@ -40,6 +40,9 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
+          <el-button type="warning" size="mini" @click="handleRole(row)">
+            角色
+          </el-button>
           <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
             删除
           </el-button>
@@ -82,11 +85,29 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogRoleVisible">
+      <el-form ref="roleForm" :rules="roleRules" :model="roleTemp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="角色列表" prop="roleIds">
+          <el-checkbox-group v-model="roleTemp.roleIds">
+            <el-checkbox v-for="item in roles" :key="item.roleId" :label="item.roleId">{{ item.roleName }}</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogRoleVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="saveRoleData()">
+          保存
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, createUser, updateUser, deleteUser } from '@/api/sys/user'
+import { fetchList, createUser, updateUser, deleteUser, fetchAccRole, saveAccRole } from '@/api/sys/user'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 import md5 from 'md5'
@@ -125,8 +146,6 @@ export default {
         name: undefined
       },
       statusDic,
-      sortOptions: [{ label: 'ID Ascending', key: '+id' }, { label: 'ID Descending', key: '-id' }],
-      statusOptions: ['published', 'draft', 'deleted'],
       temp: {
         accId: undefined,
         accName: '',
@@ -136,11 +155,18 @@ export default {
         status: '',
         remark: ''
       },
+      roleTemp: {
+        accId: undefined,
+        roleIds: []
+      },
+      roles: [],
+      dialogRoleVisible: false,
       dialogFormVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑用户',
-        create: '添加用户'
+        create: '添加用户',
+        role: '授权角色'
       },
       rules: {
         accName: [
@@ -154,18 +180,22 @@ export default {
           { pattern: /^1\d{10}$/, message: '手机号码格式不正确', trigger: 'blur' }
         ],
         status: [{ required: true, message: '账号状态不能为空', trigger: 'change' }]
+      },
+      roleRules: {
+        roleIds: [
+          { required: true, message: '请选择一个角色', trigger: 'change' }
+        ]
       }
     }
   },
   watch: {
     dialogStatus: function(val) {
-      debugger
       if (val === 'create') {
         this.rules.accPwd = [
           { required: true, message: '账户密码不能为空', trigger: 'change' },
           { min: 6, message: '账户密码长度至少6位', trigger: 'blur' }
         ]
-      } else {
+      } else if (val === 'update') {
         this.rules.accPwd = [
           { min: 6, message: '账户密码长度至少6位', trigger: 'blur' }
         ]
@@ -182,10 +212,6 @@ export default {
         this.list = response.data
         this.total = response.count
         this.listLoading = false
-        // Just to simulate the time of the request
-        // setTimeout(() => {
-        //   this.listLoading = false
-        // }, 1.5 * 1000)
       })
     },
     handleFilter() {
@@ -265,6 +291,46 @@ export default {
             this.$notify({
               title: '成功',
               message: '保存成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleRole(row) {
+      const accId = row.ACC_ID
+      fetchAccRole(accId).then(response => {
+        this.roles = response.data || []
+        this.roleTemp.accId = accId
+        this.roleTemp.roleIds = []
+        this.roles.map((role) => {
+          const { roleId, checked } = role
+          if (checked === 1) {
+            this.roleTemp.roleIds.push(roleId)
+          }
+        })
+      }).then(() => {
+        this.dialogStatus = 'role'
+        this.dialogRoleVisible = true
+        this.$nextTick(() => {
+          this.$refs['roleForm'].clearValidate()
+        })
+      })
+    },
+    saveRoleData() {
+      this.$refs['roleForm'].validate((valid) => {
+        if (valid) {
+          const tempData = Object.assign({}, this.roleTemp)
+          const param = {
+            accId: tempData.accId,
+            rIds: tempData.roleIds.join(',')
+          }
+          saveAccRole(param).then(() => {
+            this.dialogRoleVisible = false
+            this.$notify({
+              title: '成功',
+              message: '角色授权成功',
               type: 'success',
               duration: 2000
             })

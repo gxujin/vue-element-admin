@@ -47,3 +47,19 @@ export function deleteUser(data) {
     data
   })
 }
+
+export function fetchAccRole(accId) {
+  return request({
+    url: '/pms/api/account/acc-role',
+    method: 'get',
+    params: { accId }
+  })
+}
+
+export function saveAccRole(data) {
+  return request({
+    url: '/pms/api/account/add-role',
+    method: 'post',
+    data
+  })
+}
