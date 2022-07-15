@@ -49,7 +49,7 @@ service.interceptors.response.use(
     if (contentType === 'image/jpeg') {
       return res
     }
-    if (res.page) {
+    if (res.page || res.code) {
       return res
     }
 
