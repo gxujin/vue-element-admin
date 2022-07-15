@@ -23,6 +23,7 @@
         type="index"
         width="50"
         align="center"
+        label="序号"
       />
       <el-table-column prop="ACC_NAME" sortable label="账户名" min-width="150px" />
       <el-table-column prop="NAME" label="姓名" min-width="150px" />
