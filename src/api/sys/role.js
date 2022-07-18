@@ -31,3 +31,21 @@ export function deleteRole(query) {
     params: query
   })
 }
+
+export function fetchResTree(roleId) {
+  return request({
+    url: '/pms/api/role/res-tree',
+    method: 'get',
+    params: {
+      id: roleId
+    }
+  })
+}
+
+export function saveRoleRes(data) {
+  return request({
+    url: '/pms/api/role/add-res',
+    method: 'post',
+    data
+  })
+}

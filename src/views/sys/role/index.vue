@@ -32,6 +32,9 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             编辑
           </el-button>
+          <el-button type="warning" size="mini" @click="handleRes(row)">
+            授权菜单
+          </el-button>
           <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
             删除
           </el-button>
@@ -59,11 +62,36 @@
         </el-button>
       </div>
     </el-dialog>
+
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogResVisible">
+      <el-form ref="resForm" :rules="resRules" :model="resTemp" label-position="left" label-width="100px" style="width: 400px; margin-left:50px;">
+        <el-form-item label="资源目录" prop="resIds">
+          <el-tree
+            ref="resTree"
+            :data="resTreeData"
+            show-checkbox
+            node-key="id"
+            default-expand-all
+            :check-on-click-node="checkOnClickNode"
+            :default-checked-keys="resTemp.resIds"
+            :props="resDefaultProps"
+          />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogResVisible = false">
+          取消
+        </el-button>
+        <el-button type="primary" @click="saveResData()">
+          保存
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { fetchList, createRole, updateRole, deleteRole } from '@/api/sys/role'
+import { fetchList, createRole, updateRole, deleteRole, fetchResTree, saveRoleRes } from '@/api/sys/role'
 import waves from '@/directive/waves' // waves directive
 import Pagination from '@/components/Pagination' // secondary package based on el-pagination
 
@@ -90,14 +118,28 @@ export default {
         roleName: '',
         roleDesc: ''
       },
+      resTreeData: [],
+      resTemp: {
+        roleId: undefined,
+        resIds: []
+      },
+      checkOnClickNode: true,
       dialogFormVisible: false,
+      dialogResVisible: false,
       dialogStatus: '',
       textMap: {
         update: '编辑角色',
-        create: '添加角色'
+        create: '添加角色',
+        resource: '授权菜单'
       },
       rules: {
         roleName: [{ required: true, message: '角色名称不能为空', trigger: 'change' }]
+      },
+      resRules: {
+      },
+      resDefaultProps: {
+        children: 'children',
+        label: 'title'
       }
     }
   },
@@ -170,6 +212,57 @@ export default {
             this.$notify({
               title: '成功',
               message: '保存成功',
+              type: 'success',
+              duration: 2000
+            })
+          })
+        }
+      })
+    },
+    handleRes(row) {
+      const roleId = row.rId
+      fetchResTree(roleId).then(response => {
+        this.resTreeData = response.data || []
+        this.resTemp.roleId = roleId
+        this.resTemp.resIds = []
+        this.strResCheckedIds(this.resTreeData)
+      }).then(() => {
+        this.dialogStatus = 'resource'
+        this.dialogResVisible = true
+        // this.$nextTick(() => {
+        //   this.$refs['resForm'].clearValidate()
+        // })
+      })
+    },
+    strResCheckedIds(nodes) {
+      nodes.map((node) => {
+        const { id, checked, children } = node
+        if (checked === 1) {
+          this.resTemp.resIds.push(id)
+        }
+        if (children) {
+          this.strResCheckedIds(children)
+        }
+      })
+    },
+    getCheckedKeys() {
+      return this.$refs.resTree.getCheckedKeys()
+    },
+    saveResData() {
+      this.$refs['resForm'].validate((valid) => {
+        if (valid) {
+          debugger
+          const resIds = this.getCheckedKeys()
+          const tempData = Object.assign({}, this.resTemp)
+          const param = {
+            roleId: tempData.roleId,
+            resIds: resIds.join(',')
+          }
+          saveRoleRes(param).then(() => {
+            this.dialogResVisible = false
+            this.$notify({
+              title: '成功',
+              message: '授权菜单成功',
               type: 'success',
               duration: 2000
             })
