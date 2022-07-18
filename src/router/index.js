@@ -123,6 +123,50 @@ export const constantRoutes = [
         meta: { title: '个人中心', icon: 'user', noCache: true }
       }
     ]
+  },
+  {
+    path: '/gws',
+    component: Layout,
+    redirect: 'noRedirect',
+    name: 'gws',
+    meta: {
+      title: '应用接口监控',
+      icon: 'monitor'
+    },
+    children: [
+      {
+        path: 'app/index',
+        component: () => import('@/views/gws/app/index'),
+        name: 'yyfgl',
+        meta: {
+          title: '应用方管理'
+        }
+      },
+      {
+        path: 'api/index',
+        component: () => import('@/views/gws/api/index'),
+        name: 'yyjkgl',
+        meta: {
+          title: '应用接口管理'
+        }
+      },
+      {
+        path: 'policy/index',
+        component: () => import('@/views/gws/policy/index'),
+        name: 'jkyzgl',
+        meta: {
+          title: '接口阈值管理'
+        }
+      },
+      {
+        path: 'log/index',
+        component: () => import('@/views/gws/log/index'),
+        name: 'jkdyjl',
+        meta: {
+          title: '接口调用记录'
+        }
+      }
+    ]
   }
 ]
 
