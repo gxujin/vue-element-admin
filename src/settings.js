@@ -1,5 +1,5 @@
 module.exports = {
-  title: '后台管理系统',
+  title: '三代社保卡应用平台',
 
   /**
    * @type {boolean} true | false

@@ -73,7 +73,7 @@ const actions = {
 
         commit('SET_ROLES', roles || ['admin'])
         commit('SET_NAME', name)
-        commit('SET_AVATAR', avatar || 'https://gw.alipayobjects.com/zos/antfincdn/XAosXuNZyF/BiazfanxmamNRoxxVxka.png')
+        commit('SET_AVATAR', avatar || 'images/avatar.png')
         commit('SET_INTRODUCTION', introduction)
         resolve(data)
       }).catch(error => {

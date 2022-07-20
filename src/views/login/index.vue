@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">后台管理系统</h3>
+        <h3 class="title">三代社保卡应用平台</h3>
       </div>
 
       <el-form-item prop="username">
@@ -118,7 +118,7 @@ export default {
       captchaImageUrl: '',
       loginForm: {
         username: 'admin',
-        password: '000000',
+        password: 'Digital2019@1',
         codeId: '',
         code: ''
       },

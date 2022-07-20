@@ -59,23 +59,29 @@ service.interceptors.response.use(
     const message = res.rtnMsg
 
     if (code !== '000000') {
-      Message({
-        message: message || 'Error',
-        type: 'error',
-        duration: 5 * 1000
-      })
-
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (code === 50008 || code === 50012 || code === 50014) {
+      if (code === '100001') {
+        const reLoginMsg = '登录已超时，请重新登录'
         // to re-login
-        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-          confirmButtonText: 'Re-Login',
-          cancelButtonText: 'Cancel',
-          type: 'warning'
+        MessageBox.confirm(reLoginMsg, '提示', {
+          confirmButtonText: '重新登录',
+          cancelButtonText: '取消',
+          type: 'warning',
+          closeOnClickModal: false
         }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload()
-          })
+          // store.dispatch('user/resetToken').then(() => {
+          //   location.reload()
+          // })
+          location.reload()
+        }).catch(() => {
+        })
+        return Promise.reject(reLoginMsg)
+      } else {
+        console.log('Error', message)
+        Message({
+          message: message || 'Error',
+          type: 'error',
+          duration: 5 * 1000
         })
       }
       return Promise.reject(new Error(message || 'Error'))
