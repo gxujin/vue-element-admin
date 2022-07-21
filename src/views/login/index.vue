@@ -118,7 +118,7 @@ export default {
       captchaImageUrl: '',
       loginForm: {
         username: 'admin',
-        password: 'Digital2019@1',
+        password: '000000',
         codeId: '',
         code: ''
       },

@@ -69,10 +69,9 @@ service.interceptors.response.use(
           type: 'warning',
           closeOnClickModal: false
         }).then(() => {
-          // store.dispatch('user/resetToken').then(() => {
-          //   location.reload()
-          // })
-          location.reload()
+          store.dispatch('user/resetToken').then(() => {
+            location.reload()
+          })
         }).catch(() => {
         })
         return Promise.reject(reLoginMsg)
