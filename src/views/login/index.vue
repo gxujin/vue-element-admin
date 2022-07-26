@@ -62,7 +62,7 @@
             />
           </el-col>
           <el-col :span="6">
-            <el-image style="display: block;margin-top:5px;" :src="captchaImageUrl" @click="getCaptcha">
+            <el-image style="display: block;border-radius:2px;margin-top:2px;margin-right: 2px;" :src="captchaImageUrl" @click="getCaptcha">
               <div slot="error" class="image-slot">
                 <i class="el-icon-picture-outline" />
               </div>
@@ -118,14 +118,14 @@ export default {
       captchaImageUrl: '',
       loginForm: {
         username: 'admin',
-        password: '000000',
+        password: 'Digital2019@1',
         codeId: '',
         code: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }],
-        code: [{ required: true, trigger: 'blur', validator: validateCode }]
+        code: [{ required: true, trigger: 'change', validator: validateCode }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -156,6 +156,8 @@ export default {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
+    } else if (this.loginForm.code === '') {
+      this.$refs.code.focus()
     }
   },
   destroyed() {
