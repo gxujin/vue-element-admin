@@ -1,64 +1,72 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <el-select v-model="listQuery.appId" placeholder="应用方名称" class="filter-item" clearable>
-        <el-option
-          v-for="item in appDic"
-          :key="item.code"
-          :label="item.name"
-          :value="item.code"
-        />
-      </el-select>
-      <el-select v-model="listQuery.transCode" placeholder="接口名称" class="filter-item" clearable>
-        <el-option
-          v-for="item in apiDic"
-          :key="item.code"
-          :label="item.name"
-          :value="item.code"
-        />
-      </el-select>
-      <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
-        查询
-      </el-button>
-      <el-button v-waves class="filter-item" style="margin-left: 10px;" type="" icon="el-icon-refresh" @click="clearListQuery">
-        重置
-      </el-button>
+    <div class="table-page-search-wrapper">
+      <el-form :model="listQuery" :inline="true" label-suffix=":">
+        <el-form-item label="应用方名称">
+          <el-select v-model="listQuery.appId" placeholder="请选择应用方" clearable>
+            <el-option
+              v-for="item in appDic"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="应用方名称">
+          <el-select v-model="listQuery.transCode" placeholder="请选择接口" clearable>
+            <el-option
+              v-for="item in apiDic"
+              :key="item.code"
+              :label="item.name"
+              :value="item.code"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
+            查询
+          </el-button>
+          <el-button v-waves class="filter-item" style="margin-left: 10px;" type="" icon="el-icon-refresh" @click="clearListQuery">
+            重置
+          </el-button>
+        </el-form-item>
+      </el-form>
     </div>
-
-    <el-table
-      :key="tableKey"
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%;"
-    >
-      <el-table-column
-        type="index"
-        width="50"
-        align="center"
-        label="序号"
-      />
-      <el-table-column prop="APP_NAME" label="应用名称" min-width="100px" />
-      <el-table-column prop="TRANS_NAME" label="接口名称" min-width="100px" />
-      <el-table-column prop="REQ_IP" label="请求IP地址" min-width="100px" />
-      <el-table-column prop="REQ_TIME" label="请求时间" min-width="150px" :formatter="dateFormat" />
-      <el-table-column prop="RES_TIME" label="返回时间" min-width="150px" :formatter="dateFormat" />
-      <el-table-column prop="RTN_CODE" label="返回码" min-width="100px" />
-      <el-table-column prop="RTN_MSG" label="返回信息" min-width="100px" :show-overflow-tooltip="showOverflowTooltip" />
-      <el-table-column label="调用结果" align="center" class-name="status-col" width="100">
-        <template slot-scope="{row}">
-          <el-tooltip content="点击查看详情" placement="bottom" effect="light">
-            <el-tag :type="row.RESULT | statusFilter" @click="handleResult(row)">
-              {{ row.RESULT | resultNameFilter }}
-            </el-tag>
-          </el-tooltip>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    <div class="table-wrapper">
+      <el-table
+        :key="tableKey"
+        v-loading="listLoading"
+        :data="list"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+      >
+        <el-table-column
+          type="index"
+          width="50"
+          align="center"
+          label="序号"
+        />
+        <el-table-column prop="APP_NAME" label="应用名称" min-width="100px" />
+        <el-table-column prop="TRANS_NAME" label="接口名称" min-width="100px" />
+        <el-table-column prop="REQ_IP" label="请求IP地址" min-width="100px" />
+        <el-table-column prop="REQ_TIME" label="请求时间" min-width="150px" :formatter="dateFormat" />
+        <el-table-column prop="RES_TIME" label="返回时间" min-width="150px" :formatter="dateFormat" />
+        <el-table-column prop="RTN_CODE" label="返回码" min-width="100px" />
+        <el-table-column prop="RTN_MSG" label="返回信息" min-width="100px" :show-overflow-tooltip="showOverflowTooltip" />
+        <el-table-column label="调用结果" align="center" class-name="status-col" width="100">
+          <template slot-scope="{row}">
+            <el-tooltip content="点击查看详情" placement="bottom" effect="light">
+              <el-tag :type="row.RESULT | statusFilter" @click="handleResult(row)">
+                {{ row.RESULT | resultNameFilter }}
+              </el-tag>
+            </el-tooltip>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    </div>
 
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="margin-left:50px;">

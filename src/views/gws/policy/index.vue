@@ -1,75 +1,84 @@
 <template>
   <div class="app-container">
-    <div class="filter-container">
-      <el-select v-model="listQuery.policyType" placeholder="策略类型" class="filter-item" clearable>
-        <el-option
-          v-for="(value,name) in policyTypeDic"
-          :key="name"
-          :label="value"
-          :value="name"
-        />
-      </el-select>
-      <el-input v-model="listQuery.policyName" placeholder="策略名称" style="width: 200px;" class="filter-item" @keyup.enter.native="handleFilter" />
-      <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
-        查询
+    <div class="table-page-search-wrapper">
+      <el-form :model="listQuery" :inline="true" label-suffix=":">
+        <el-form-item label="策略类型">
+          <el-select v-model="listQuery.policyType" placeholder="请选择策略类型" clearable>
+            <el-option
+              v-for="(value,name) in policyTypeDic"
+              :key="name"
+              :label="value"
+              :value="name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="策略名称">
+          <el-input v-model="listQuery.policyName" placeholder="请输入策略名称" @keyup.enter.native="handleFilter" />
+        </el-form-item>
+        <el-form-item>
+          <el-button v-waves class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-search" @click="handleFilter">
+            查询
+          </el-button>
+          <el-button v-waves class="filter-item" style="margin-left: 10px;" type="" icon="el-icon-refresh" @click="clearListQuery">
+            重置
+          </el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <div class="table-operator">
+      <el-button type="primary" style="margin-bottom: 5px;" icon="el-icon-edit" @click="handleCreate">
+        新增策略
       </el-button>
-      <el-button v-waves class="filter-item" style="margin-left: 10px;" type="" icon="el-icon-refresh" @click="clearListQuery">
-        重置
+      <el-button type="primary" style="margin-bottom: 5px;" icon="el-icon-finished" @click="handleRedis">
+        批量同步redis
       </el-button>
     </div>
-
-    <el-button type="primary" style="margin-bottom: 5px;" icon="el-icon-edit" @click="handleCreate">
-      新增策略
-    </el-button>
-    <el-button type="primary" style="margin-bottom: 5px;" icon="el-icon-finished" @click="handleRedis">
-      批量同步redis
-    </el-button>
-    <el-table
-      :key="tableKey"
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%;"
-    >
-      <el-table-column
-        type="index"
-        width="50"
-        align="center"
-        label="序号"
-      />
-      <el-table-column prop="POLICY_TYPE" label="策略类型" align="center" width="100">
-        <template slot-scope="{row}">
-          {{ row.POLICY_TYPE | policyTypeFilter }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="POLICY_NAME" label="策略名称" min-width="150px" />
-      <el-table-column prop="APP_NAME" label="应用名称" min-width="100px" />
-      <el-table-column prop="API_DEFAULT" label="API流量限制" min-width="100px" />
-      <el-table-column label="单位时间" align="center" width="100">
-        <template slot-scope="{row}">
-          {{ row.UNIT | unitFilter }}
-        </template>
-      </el-table-column>
-      <el-table-column prop="REMARK" label="备注" min-width="100px" :show-overflow-tooltip="showOverflowTooltip" />
-      <el-table-column label="操作" fixed="right" align="center" min-width="200px" class-name="small-padding fixed-width">
-        <template slot-scope="{row,$index}">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
-            编辑
-          </el-button>
-          <el-button type="warning" size="mini" @click="handleBind(row)">
-            绑定API
-          </el-button>
-          <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
-            删除
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
-
-    <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
-
+    <div class="table-wrapper">
+      <el-table
+        :key="tableKey"
+        v-loading="listLoading"
+        :data="list"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%;"
+      >
+        <el-table-column
+          type="index"
+          width="50"
+          align="center"
+          label="序号"
+        />
+        <el-table-column prop="POLICY_TYPE" label="策略类型" align="center" width="100">
+          <template slot-scope="{row}">
+            {{ row.POLICY_TYPE | policyTypeFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="POLICY_NAME" label="策略名称" min-width="150px" />
+        <el-table-column prop="APP_NAME" label="应用名称" min-width="100px" />
+        <el-table-column prop="API_DEFAULT" label="API流量限制" min-width="100px" />
+        <el-table-column label="单位时间" align="center" width="100">
+          <template slot-scope="{row}">
+            {{ row.UNIT | unitFilter }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="REMARK" label="备注" min-width="100px" :show-overflow-tooltip="showOverflowTooltip" />
+        <el-table-column label="操作" fixed="right" align="center" min-width="200px" class-name="small-padding fixed-width">
+          <template slot-scope="{row,$index}">
+            <el-button type="primary" size="mini" @click="handleUpdate(row)">
+              编辑
+            </el-button>
+            <el-button type="warning" size="mini" @click="handleBind(row)">
+              绑定API
+            </el-button>
+            <el-button type="danger" size="mini" @click="handleDelete(row,$index)">
+              删除
+            </el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+    </div>
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
         <el-form-item label="策略类型" prop="policyType">
@@ -126,7 +135,6 @@
         </el-button>
       </div>
     </el-dialog>
-
     <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogBindVisible" width="80%">
       <el-row>
         <el-col :span="12">
