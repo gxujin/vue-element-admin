@@ -21,7 +21,7 @@
         />
       </el-form-item>
 
-      <el-tooltip v-model="capsTooltip" content="Caps lock is On" placement="right" manual>
+      <el-tooltip v-model="capsTooltip" content="大小写锁定已打开" placement="right" manual>
         <el-form-item prop="password">
           <span class="svg-container">
             <svg-icon icon-class="password" />
@@ -44,31 +44,28 @@
         </el-form-item>
       </el-tooltip>
       <el-form-item prop="code">
-        <el-row>
-          <el-col :span="18">
-            <span class="svg-container">
-              <svg-icon icon-class="captcha" />
-            </span>
-            <el-input
-              ref="code"
-              v-model="loginForm.code"
-              placeholder="验证码"
-              name="code"
-              type="text"
-              tabindex="3"
-              auto-complete="off"
-              maxlength="4"
-              @keyup.enter.native="handleLogin"
-            />
-          </el-col>
-          <el-col :span="6">
-            <el-image style="display: block;border-radius:2px;margin-top:2px;margin-right: 2px;" :src="captchaImageUrl" @click="getCaptcha">
-              <div slot="error" class="image-slot">
-                <i class="el-icon-picture-outline" />
-              </div>
-            </el-image>
-          </el-col>
-        </el-row>
+        <span class="svg-container">
+          <svg-icon icon-class="captcha" />
+        </span>
+        <el-input
+          ref="code"
+          v-model="loginForm.code"
+          placeholder="验证码"
+          name="code"
+          type="text"
+          tabindex="3"
+          auto-complete="off"
+          maxlength="4"
+          style="width: 60%"
+          @keyup.enter.native="handleLogin"
+        />
+        <div style="width: 30%;float:right;">
+          <el-image style="height: 37px;top:5px;" :src="captchaImageUrl" @click="getCaptcha">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline" />
+            </div>
+          </el-image>
+        </div>
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
