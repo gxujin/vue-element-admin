@@ -79,7 +79,7 @@
       </el-table>
       <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
     </div>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
         <el-form-item label="策略类型" prop="policyType">
           <el-select v-model="temp.policyType" placeholder="请选择策略类型">
@@ -135,7 +135,7 @@
         </el-button>
       </div>
     </el-dialog>
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogBindVisible" width="80%">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogBindVisible" width="80%">
       <el-row>
         <el-col :span="12">
           <el-card style="margin-right: 2px;">

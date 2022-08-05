@@ -59,7 +59,7 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
         <el-form-item label="API代码" prop="apiCode">
           <el-input v-model="temp.apiCode" maxlength="10" :disabled="dialogStatus==='create'?false:true" placeholder="请输入API代码" />
@@ -89,7 +89,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogAuthVisible">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogAuthVisible">
       <el-transfer
         v-model="auth.authAppData"
         :props="{

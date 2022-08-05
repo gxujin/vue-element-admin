@@ -21,6 +21,20 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       config.headers['token'] = getToken()
     }
+    const _t = new Date().getTime()
+    const method = config.method.toLowerCase()
+    if (method === 'post') {
+      config.data = {
+        ...config.data,
+        _t: _t
+      }
+    } else if (method === 'get') {
+      config.params = {
+        ...config.params,
+        _t: _t
+      }
+    }
+
     return config
   },
   error => {

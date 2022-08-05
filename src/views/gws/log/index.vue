@@ -65,18 +65,22 @@
           </template>
         </el-table-column>
       </el-table>
-      <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
+      <pagination v-show="total>0" :total="total" :auto-scroll="false" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
     </div>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible" width="80%">
-      <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="margin-left:50px;">
-        <el-form-item label="请求报文">
-          <pre v-highlightjs="temp.reqContent" style="margin: 0"><code class="json" /></pre>
-        </el-form-item>
-        <el-form-item label="返回报文">
-          <pre v-highlightjs="temp.resContent" style="margin: 0"><code class="json" /></pre>
-        </el-form-item>
-      </el-form>
+    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+      <el-collapse v-model="activeNames">
+        <el-collapse-item title="请求报文" name="1">
+          <div class="json-editor">
+            <textarea ref="reqContent" />
+          </div>
+        </el-collapse-item>
+        <el-collapse-item title="返回报文" name="2">
+          <div class="json-editor">
+            <textarea ref="resContent" />
+          </div>
+        </el-collapse-item>
+      </el-collapse>
     </el-dialog>
   </div>
 </template>
@@ -88,10 +92,9 @@ import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import moment from 'moment'
 
-import Vue from 'vue'
-import VueHighlightJS from 'vue-highlightjs'
-import 'highlight.js/styles/atom-one-dark.css'
-Vue.use(VueHighlightJS)
+import CodeMirror from 'codemirror'
+import 'codemirror/lib/codemirror.css'
+import 'codemirror/theme/3024-day.css'
 
 const resultDic = {
   '0': '失败',
@@ -116,6 +119,7 @@ export default {
   },
   data() {
     return {
+      activeNames: ['1', '2'],
       appDic: [],
       apiDic: [],
       dateFormat: function(row, column, cellValue, index) {
@@ -143,7 +147,9 @@ export default {
         result: '查看详情'
       },
       rules: {
-      }
+      },
+      jsonEditorReq: undefined,
+      jsonEditorRes: undefined
     }
   },
   watch: {
@@ -190,13 +196,54 @@ export default {
       fetchLogInfo({ id: id }).then(response => {
         const data = response.data || {}
         const { reqContent, resContent } = data
-        this.temp.reqContent = reqContent
-        this.temp.resContent = resContent
+        const json = JSON.parse(reqContent)
+        this.temp.reqContent = JSON.stringify(json, null, 4)
+
+        const json2 = JSON.parse(resContent)
+        this.temp.resContent = JSON.stringify(json2, null, 4)
       }).then(() => {
         this.dialogStatus = 'result'
         this.dialogFormVisible = true
+        this.activeNames = ['1', '2']
+      }).then(() => {
+        if (!this.jsonEditorReq) {
+          this.jsonEditorReq = CodeMirror.fromTextArea(this.$refs.reqContent, {
+            lineNumbers: true,
+            mode: 'application/json',
+            theme: '3024-day',
+            readOnly: true
+          })
+        }
+        if (!this.jsonEditorRes) {
+          this.jsonEditorRes = CodeMirror.fromTextArea(this.$refs.resContent, {
+            lineNumbers: true,
+            mode: 'application/json',
+            theme: '3024-day',
+            readOnly: true
+          })
+        }
+
+        this.jsonEditorReq.setValue(this.temp.reqContent)
+        this.jsonEditorRes.setValue(this.temp.resContent)
       })
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.json-editor {
+  height: 100%;
+  position: relative;
+
+  ::v-deep {
+    .CodeMirror {
+      height: auto;
+    }
+
+    .cm-s-rubyblue span.cm-string {
+      color: #F08047;
+    }
+  }
+}
+</style>

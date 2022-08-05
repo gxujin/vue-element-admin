@@ -59,7 +59,7 @@
 
     <pagination v-show="total>0" :total="total" :page.sync="listQuery.page" :limit.sync="listQuery.limit" @pagination="getList" />
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogFormVisible">
       <el-form ref="dataForm" :rules="rules" :model="temp" label-position="left" label-width="120px" style="width: 400px; margin-left:50px;">
 
         <el-form-item label="应用方ID" prop="appId">
@@ -80,7 +80,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="密钥" prop="appKey">
-          <el-input v-model="temp.appKey" placeholder="自动生成..." />
+          <el-input v-model="temp.appKey" :readonly="true" placeholder="自动生成..." />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-select v-model="temp.status" class="filter-item" placeholder="请选择状态">
@@ -101,7 +101,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog :title="textMap[dialogStatus]" :visible.sync="dialogAuthVisible">
+    <el-dialog :append-to-body="true" :title="textMap[dialogStatus]" :visible.sync="dialogAuthVisible">
       <el-table
         :key="auth.tableKey"
         v-loading="auth.listLoading"
