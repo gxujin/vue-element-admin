@@ -75,7 +75,7 @@
 
         </el-form-item>
         <el-form-item label="应用类型" prop="appType">
-          <el-select v-model="temp.appType" class="filter-item" placeholder="请选择应用类型">
+          <el-select v-model="temp.appType" class="filter-item" placeholder="请选择应用类型" clearable>
             <el-option v-for="(value,name) in appTypeDic" :key="name" :label="value" :value="name" />
           </el-select>
         </el-form-item>
