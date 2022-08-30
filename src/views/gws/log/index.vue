@@ -55,13 +55,18 @@
         <el-table-column prop="RES_TIME" label="返回时间" min-width="150px" :formatter="dateFormat" />
         <el-table-column prop="RTN_CODE" label="返回码" min-width="100px" />
         <el-table-column prop="RTN_MSG" label="返回信息" min-width="100px" :show-overflow-tooltip="showOverflowTooltip" />
-        <el-table-column label="调用结果" align="center" class-name="status-col" width="100">
+        <el-table-column
+          label="调用结果"
+          align="center"
+          class-name="status-col"
+          width="100"
+          :filters="[{ text: '成功', value: '1' }, { text: '失败', value: '0' }]"
+          :filter-method="filterResult"
+        >
           <template slot-scope="{row}">
-            <el-tooltip content="点击查看详情" placement="bottom" effect="light">
-              <el-tag :type="row.RESULT | statusFilter" @click="handleResult(row)">
-                {{ row.RESULT | resultNameFilter }}
-              </el-tag>
-            </el-tooltip>
+            <el-tag :type="row.RESULT | statusFilter" style="cursor: pointer;" @click="handleResult(row)">
+              {{ row.RESULT | resultNameFilter }}
+            </el-tag>
           </template>
         </el-table-column>
       </el-table>
@@ -184,6 +189,15 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    filterResult(value, row, column) {
+      if (value === '0') {
+        return row.RTN_CODE === '999999'
+      } else if (value === '1') {
+        return row.RTN_CODE === '000000'
+      } else {
+        return true
+      }
     },
     resetTemp() {
       this.temp = {
