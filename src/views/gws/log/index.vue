@@ -260,4 +260,8 @@ export default {
     }
   }
 }
+
+  ::v-deep .el-dialog__body {
+    padding-top: 10px;
+  }
 </style>
