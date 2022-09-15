@@ -34,6 +34,7 @@
     </div>
     <div class="table-wrapper">
       <el-table
+        ref="filterTable"
         :key="tableKey"
         v-loading="listLoading"
         :data="list"
@@ -185,6 +186,7 @@ export default {
     clearListQuery() {
       this.listQuery.appId = undefined
       this.listQuery.transCode = undefined
+      this.$refs.filterTable.clearFilter()
     },
     handleFilter() {
       this.listQuery.page = 1
