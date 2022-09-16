@@ -1,5 +1,5 @@
 module.exports = {
-  title: '三代社保卡应用平台',
+  title: '未来社区智慧餐饮系统',
 
   /**
    * @type {boolean} true | false

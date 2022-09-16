@@ -11,7 +11,7 @@ export function captcha(r) {
 
 export function login(data) {
   return request({
-    url: '/pms/api/account/login',
+    url: '/vue-element-admin/user/login',
     method: 'post',
     data
   })
@@ -19,7 +19,7 @@ export function login(data) {
 
 export function getInfo(token) {
   return request({
-    url: '/pms/api/account/get2',
+    url: '/vue-element-admin/user/info',
     method: 'get',
     params: { token }
   })
@@ -27,7 +27,7 @@ export function getInfo(token) {
 
 export function logout() {
   return request({
-    url: '/pms/api/account/logout',
+    url: '/vue-element-admin/user/logout',
     method: 'post'
   })
 }

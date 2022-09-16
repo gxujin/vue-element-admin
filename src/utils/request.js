@@ -19,22 +19,8 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['token'] = getToken()
+      config.headers['X-Token'] = getToken()
     }
-    const _t = new Date().getTime()
-    const method = config.method.toLowerCase()
-    if (method === 'post') {
-      config.data = {
-        ...config.data,
-        _t: _t
-      }
-    } else if (method === 'get') {
-      config.params = {
-        ...config.params,
-        _t: _t
-      }
-    }
-
     return config
   },
   error => {
@@ -49,7 +35,7 @@ service.interceptors.response.use(
   /**
    * If you want to get http information such as headers or status
    * Please return  response => response
-  */
+   */
 
   /**
    * Determine the request status by custom code
@@ -59,45 +45,28 @@ service.interceptors.response.use(
   response => {
     const res = response.data
 
-    const contentType = response.headers['content-type']
-    if (contentType === 'image/jpeg') {
-      return res
-    }
-    if (res.page || res.code) {
-      return res
-    }
-
-    // debugger
     // if the custom code is not 20000, it is judged as an error.
-    const code = res.rtnCode
-    const message = res.rtnMsg
+    if (res.code !== 20000) {
+      Message({
+        message: res.message || 'Error',
+        type: 'error',
+        duration: 5 * 1000
+      })
 
-    if (code !== '000000') {
       // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      if (code === '100001') {
-        const reLoginMsg = '登录已超时，请重新登录'
+      if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
         // to re-login
-        MessageBox.confirm(reLoginMsg, '提示', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning',
-          closeOnClickModal: false
+        MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
+          confirmButtonText: 'Re-Login',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
         }).then(() => {
           store.dispatch('user/resetToken').then(() => {
             location.reload()
           })
-        }).catch(() => {
-        })
-        return Promise.reject(reLoginMsg)
-      } else {
-        console.log('Error', message)
-        Message({
-          message: message || 'Error',
-          type: 'error',
-          duration: 5 * 1000
         })
       }
-      return Promise.reject(new Error(message || 'Error'))
+      return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }
