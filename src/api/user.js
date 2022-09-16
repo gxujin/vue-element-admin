@@ -2,10 +2,10 @@ import request from '@/utils/request'
 
 export function captcha(r) {
   return request({
-    url: '/pms/imgCode',
+    url: '/vue-element-admin/user/imgCode',
     method: 'get',
-    params: { r },
-    responseType: 'arraybuffer'
+    params: { r }
+    // responseType: 'arraybuffer'
   })
 }
 

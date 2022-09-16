@@ -43,6 +43,30 @@
           </span>
         </el-form-item>
       </el-tooltip>
+      <el-form-item prop="code">
+        <span class="svg-container">
+          <svg-icon icon-class="captcha" />
+        </span>
+        <el-input
+          ref="code"
+          v-model="loginForm.code"
+          placeholder="验证码"
+          name="code"
+          type="text"
+          tabindex="3"
+          auto-complete="off"
+          maxlength="4"
+          style="width: 60%"
+          @keyup.enter.native="handleLogin"
+        />
+        <div style="width: 30%;float:right;">
+          <el-image style="height: 37px;top:5px;" :src="captchaImageUrl" @click="getCaptcha">
+            <div slot="error" class="image-slot">
+              <i class="el-icon-picture-outline" />
+            </div>
+          </el-image>
+        </div>
+      </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
     </el-form>
@@ -80,17 +104,25 @@ export default {
         callback()
       }
     }
+    const validateCode = (rule, value, callback) => {
+      if (!value) {
+        callback(new Error('请输入验证码'))
+      } else {
+        callback()
+      }
+    }
     return {
       captchaImageUrl: '',
       loginForm: {
         username: 'admin',
         password: 'admin',
         codeId: '',
-        code: ''
+        code: '4102'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        password: [{ required: true, trigger: 'blur', validator: validatePassword }],
+        code: [{ required: true, trigger: 'change', validator: validateCode }]
       },
       passwordType: 'password',
       capsTooltip: false,
@@ -121,6 +153,8 @@ export default {
       this.$refs.username.focus()
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus()
+    } else if (this.loginForm.code === '') {
+      this.$refs.code.focus()
     }
   },
   destroyed() {
@@ -142,7 +176,17 @@ export default {
       })
     },
     getCaptcha() {
-
+      var that = this
+      const r = Math.random() + ''
+      this.loginForm.codeId = r
+      this.$store.dispatch('user/captcha', { 'r': r }).then((data) => {
+        // return 'data:image/png;base64,' + Buffer.from(data, 'binary').toString('base64')
+        return data
+      }).then(function(data) {
+        that.captchaImageUrl = data.data
+      }).catch((err) => {
+        console.log(err)
+      })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
