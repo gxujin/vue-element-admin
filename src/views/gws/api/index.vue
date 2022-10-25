@@ -128,7 +128,7 @@ const appTypeDic = {
 }
 
 export default {
-  name: 'ComplexTable',
+  name: 'Yyjkgl',
   components: { Pagination },
   directives: { waves },
   filters: {

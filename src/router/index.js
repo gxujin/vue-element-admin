@@ -128,7 +128,7 @@ export const constantRoutes = [
     path: '/gws',
     component: Layout,
     redirect: 'noRedirect',
-    name: 'gws',
+    name: 'Gws',
     meta: {
       title: '应用接口监控',
       icon: 'monitor'
@@ -137,7 +137,7 @@ export const constantRoutes = [
       {
         path: 'app/index',
         component: () => import('@/views/gws/app/index'),
-        name: 'yyfgl',
+        name: 'Yyfgl',
         meta: {
           title: '应用方管理'
         }
@@ -145,7 +145,7 @@ export const constantRoutes = [
       {
         path: 'api/index',
         component: () => import('@/views/gws/api/index'),
-        name: 'yyjkgl',
+        name: 'Yyjkgl',
         meta: {
           title: '应用接口管理'
         }
@@ -153,7 +153,7 @@ export const constantRoutes = [
       {
         path: 'policy/index',
         component: () => import('@/views/gws/policy/index'),
-        name: 'jkyzgl',
+        name: 'Jkyzgl',
         meta: {
           title: '接口阈值管理'
         }
@@ -161,7 +161,7 @@ export const constantRoutes = [
       {
         path: 'log/index',
         component: () => import('@/views/gws/log/index'),
-        name: 'jkdyjl',
+        name: 'Jkdyjl',
         meta: {
           title: '接口调用记录'
         }

@@ -108,7 +108,7 @@ const resultDic = {
 }
 
 export default {
-  name: 'ComplexTable',
+  name: 'Jkdyjl',
   components: { Pagination },
   directives: { waves },
   filters: {

@@ -225,7 +225,7 @@ const unitDic = {
 }
 
 export default {
-  name: 'ComplexTable',
+  name: 'Jkyzgl',
   components: { Pagination },
   directives: { waves },
   filters: {
